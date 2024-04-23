@@ -15,6 +15,7 @@ def count_lines_of_code(filename):
                 lines_of_code += 1
     return lines_of_code
 
+# Separate by function
 def cyclomatic_complexity(filename):
     decision_points = 0
     with open(filename, 'r') as file:
