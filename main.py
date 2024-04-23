@@ -1,6 +1,6 @@
 import argparse
 import os
-from metrics import count_lines_of_code, cyclomatic_complexity
+from metrics import *
 
 def parse_arguments():
     parser = argparse.ArgumentParser(prog='pyMetrics',
@@ -16,27 +16,49 @@ def parse_arguments():
 
 class Source:
     def __init__(self, filename, filetype):
-        self.filename = filename
-        self.filetype = filetype
-        self.lines_of_code = 0
-        self.cyc_complexity = 0
+        self._filename = filename
+        self._filetype = filetype
+        self._lines_of_code = 0
+        self._cyc_complexity = 0
+        self._halstead_measure_N = 0
+        self._halstead_measure_n = 0
+        self._halstead_volume = 0
+        self._maintainability_index = 0
+        self._maintainability_flag = 0
 
-    # 
+    # Print and return calculated data
     def retrieve_data(self):
-        print(f"----- {self.filename} Metrics -----")
-        print(f"Lines of Code: {self.lines_of_code}")
-        print(f"Cyclomatic Complexity: {self.cyc_complexity}\n")
-        return (self.filename, self.filetype, self.lines_of_code, self.cyc_complexity)
+        # Prepare a summary of metrics in a dictionary
+        data_summary = {
+            "Filename": self._filename,
+            "Lines of Code": self._lines_of_code,
+            "Cyclomatic Complexity": self._cyc_complexity,
+            "Halstead Total Elements (N)": self._halstead_measure_N,
+            "Halstead Total Unique Elements (μ)": self._halstead_measure_n,
+            "Halstead Volume": self._halstead_volume,
+            "Maintainability Index": self._maintainability_index,
+            "Flag": self._maintainability_flag
+        }
+        
+        # Print the summary
+        print(f"----- {self._filename} Metrics -----")
+        for key, value in data_summary.items():
+            print(f"{key}: {value}")
+        
+        # Return the summary dictionary
+        return data_summary
 
     def calculate(self):
-        self.lines_of_code = count_lines_of_code(self.filename)
-        self.cyc_complexity = cyclomatic_complexity(self.filename)
+        self._lines_of_code = count_lines_of_code(self._filename)
+        self._cyc_complexity = cyclomatic_complexity(self._filename)
+        self._halstead_measure_N, self._halstead_measure_n = halstead_measure(self._filename)
+        self._halstead_volume = halstead_volume(self._halstead_measure_N, self._halstead_measure_n)
+        self._maintainability_index, self._maintainability_flag = maintainability_index(self._halstead_volume, self._cyc_complexity, self._lines_of_code)
 
 def process_file(filepath, filetype):
     x = Source(filepath, filetype)
     x.calculate()
-    x.retrieve_data()
-    #print(x.retrieve_data())
+    data = x.retrieve_data()
 
 def main():
     args = parse_arguments()
