@@ -1,5 +1,6 @@
 import unittest
-from main import factorial
+from unittest.mock import patch
+from main import factorial, main
 
 class TestFactorial(unittest.TestCase):
 
@@ -17,6 +18,10 @@ class TestFactorial(unittest.TestCase):
     def test_negative_input(self):
         with self.assertRaises(ValueError, msg="Should raise ValueError for negative input"):
             factorial(-1)
+
+    @patch('builtins.input', return_value='5')
+    def test_main(self, mock_input):
+        main()
 
 if __name__ == "__main__":
     unittest.main()
