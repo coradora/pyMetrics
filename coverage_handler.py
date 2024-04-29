@@ -44,9 +44,17 @@ def run_coverage_for_file(file_path):
         print("No data was collected.")
         coverage_percent = 0.0
     else:
+        # Generate the HTML coverage report
+        html_cov_folder = os.path.join(get_root_directory(), 'htmlcov')
+        cov.html_report(directory=html_cov_folder)
+
         # Generate the coverage report and obtain data
         covered = cov.analysis(file_path)[1]
         missed = cov.analysis(file_path)[2]
         coverage_percent = 100 * len(covered) / (len(covered) + len(missed))
 
     return coverage_percent, defect_density
+
+# Get root directory
+def get_root_directory():
+    return os.path.dirname(os.path.abspath(__file__))

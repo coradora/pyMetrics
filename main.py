@@ -27,6 +27,7 @@ class Source:
         self._maintainability_index = 0
         self._maintainability_flag = 0
         self.statement_coverage = 0
+        self.coverage_flag = 0
         self.defect_density = 0
         self.internal_reuse = 0
 
@@ -39,10 +40,17 @@ class Source:
 
     def coverage(self):
         self.statement_coverage, self.defect_density = run_coverage_for_file(self._filename)
+        if(self.statement_coverage < 41):
+            self.coverage_flag = "The testing suite needs to be improved to ensure the system functions as expected."
+        elif(self.statement_coverage > 40 and self.statement_coverage < 71):
+            self.coverage_flag = "The testing suite quality is average and should be improved."
+        else:
+            self.coverage_flag = "The testing suite is high quality."
+
 
     def retrieve_data(self):
         data_summary = {
-            "----- Metrics -----": "",
+            "Metrics": "",
             "Lines of Code": self._lines_of_code,
             "Cyclomatic Complexity": self._cyc_complexity,
             "Halstead Total Elements (N)": self._halstead_measure_N,
@@ -51,9 +59,10 @@ class Source:
             "Internal Reuse": self._internal_reuse,
             "Maintainability Index": self._maintainability_index,
             "Flag": self._maintainability_flag,
-            "----- Coverage -----": "",
+            "Coverage": "",
             "Statement Coverage": self.statement_coverage,
-            "Defect Density": self.defect_density
+            "Defect Density": self.defect_density,
+            "Coverage Rating": self.coverage_flag
         }
 
         # Print data selectively
@@ -61,7 +70,7 @@ class Source:
             if value != "":  # Print only data entries
                 print(f"{key}: {value}")
             else:  # Print headings or special entries directly
-                print(f"{key}")
+                print(f"------- {key} -------")
 
         return data_summary
 

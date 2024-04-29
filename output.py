@@ -1,14 +1,14 @@
 import os
+import webbrowser
+from jinja2 import Environment, FileSystemLoader
+
+
+# Get the root directory 
+def get_root_directory():
+    return os.path.dirname(os.path.abspath(__file__))
+
 
 def save_report(data_summary, filename, filetype):
-    """
-    Saves the provided data summary into a specified format.
-
-    Args:
-        data_summary (dict): The summary of metrics to save.
-        filename (str): The base filename for the output file.
-        filetype (str): The type of output report ('txt' or 'html').
-    """
     base_filename, _ = os.path.splitext(filename)
     output_file = f"{base_filename}_metrics.{filetype}"
 
@@ -18,11 +18,20 @@ def save_report(data_summary, filename, filetype):
             for key, value in data_summary.items():
                 f.write(f"{key}: {value}\n")
     elif filetype == 'html':
+        root_directory = get_root_directory()
+        env = Environment(loader=FileSystemLoader('templates'))
+        template = env.get_template('base.html')
+
+        # Render the template and provide data context
+        html_content = template.render(filename=filename, data_summary=data_summary, root_directory=root_directory)
+
+        # Save the rendered HTML content to the output file
         with open(output_file, 'w') as f:
-            f.write(f"<html><body><h2>{filename} Metrics</h2><ul>")
-            for key, value in data_summary.items():
-                f.write(f"<li>{key}: {value}</li>")
+            f.write(html_content)
     else:
         raise ValueError("Unsupported output type. Please choose either 'txt' or 'html'.")
 
     print(f"Report saved as {output_file}")
+
+    if filetype == 'html':
+        webbrowser.open(output_file)
