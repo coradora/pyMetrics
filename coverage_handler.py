@@ -40,7 +40,6 @@ def run_coverage_for_file(file_path):
     failed_tests = len(result.failures) + len(result.errors)
     defect_density = failed_tests / total_tests
 
-
     if not cov.get_data().measured_files():
         print("No data was collected.")
         coverage_percent = 0.0

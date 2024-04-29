@@ -1,5 +1,5 @@
 # Metrics.py
-
+import ast
 import re
 import os
 from collections import Counter
@@ -24,18 +24,47 @@ def count_lines_of_code(filename):
     return lines_of_code
 
 
-# Separate by function
-def cyclomatic_complexity(filename):
-    decision_points = 0
+def cyclomatic_complexity_with_reuse(filename):
     with open(filename, 'r') as file:
-        for line in file:
-            stripped_line = line.strip()
-            if stripped_line.startswith('if __name__ == "__main__"'):
-                continue
-            if any(stripped_line.startswith(dp) for dp in python_dp):
-                decision_points += 1
-                decision_points += stripped_line.count(' and ') + stripped_line.count(' or ')
-    return decision_points + 1
+        file_content = file.read()
+
+    # Abstract Syntax Tree
+    tree = ast.parse(file_content)
+    function_calls = get_function_calls(tree)
+    functions_declared = get_function_declarations(tree)
+
+    decision_points = 0
+    for line in file_content.splitlines():
+        stripped_line = line.strip()
+        if stripped_line.startswith('if __name__ == "__main__"'):
+            continue
+        if any(stripped_line.startswith(dp) for dp in python_dp):
+            decision_points += 1
+            decision_points += stripped_line.count(' and ') + stripped_line.count(' or ')
+
+    # Cyclomatic complexity as total decision points plus one
+    complexity = decision_points + 1
+
+    # Internal reuse using graph-based formula
+    edges = len(function_calls)
+    nodes = len(functions_declared)
+    internal_reuse = edges - nodes + 1
+
+    return complexity, internal_reuse
+
+def get_function_calls(tree):
+    function_calls = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            function_calls.append(node.func.id)
+    return function_calls
+
+def get_function_declarations(tree):
+    function_declarations = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            function_declarations.append(node.name)
+    return function_declarations
 
 # Remove comments and strings
 def clean_code(code):
