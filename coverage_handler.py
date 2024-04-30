@@ -12,8 +12,8 @@ def has_test_files(directory, pattern):
                 return True
     return False
 
-# Run coverage on file and return coverage percentage.
 def run_coverage_for_file(file_path):
+    """ Run coverage on file and return coverage percentage, HTML coverage report """
     file_dir = os.path.dirname(file_path)
     if not file_dir:
         file_dir = '.'
@@ -55,6 +55,6 @@ def run_coverage_for_file(file_path):
 
     return coverage_percent, defect_density
 
-# Get root directory
 def get_root_directory():
+    '''Get root directory for saving HTML coverage folder'''
     return os.path.dirname(os.path.abspath(__file__))

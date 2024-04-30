@@ -35,6 +35,8 @@ To run pyMetrics on a specific Python file or directory:
 python main.py <path_to_file_or_directory> --output_type txt|html
 ```
 
+* Note: I've only tested the application on Linux, issues may occur on Windows. *
+
 ## Example
 
 To analyze the code in the examples/ex1 directory and generate an HTML report:
